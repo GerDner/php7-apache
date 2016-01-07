@@ -1,5 +1,4 @@
-FROM php:7-fpm
-
+FROM php:7-apache
 
 MAINTAINER Philipp Bucher <bucher@navigate.de>
 
@@ -7,7 +6,7 @@ MAINTAINER Philipp Bucher <bucher@navigate.de>
 RUN sed -i 's/docker-php-\(ext-$ext.ini\)/\1/' /usr/local/bin/docker-php-ext-install
 
 # Install other needed extensions
-RUN apt-get update && apt-get install -y libfreetype6 libjpeg62-turbo libmcrypt4 libpng12-0 sendmail --no-install-recommends && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libfreetype6 git-core libjpeg62-turbo libmcrypt4 libpng12-0 sendmail --no-install-recommends && rm -rf /var/lib/apt/lists/*
 RUN buildDeps=" \
 		libfreetype6-dev \
 		libjpeg-dev \
@@ -40,11 +39,5 @@ RUN cat /usr/src/php/php.ini-production | sed 's/^;\(date.timezone.*\)/\1 \"Etc\
 
 # Disable cgi.fix_pathinfo in php.ini
 RUN sed -i 's/;\(cgi\.fix_pathinfo=\)1/\10/' /usr/local/etc/php/php.ini
-
-RUN adduser --system --no-create-home --disabled-login --disabled-password nginx
-
-COPY php-fpm.conf /usr/local/etc/
-
-RUN usermod -u 1200 nginx
 
 WORKDIR /usr/share/nginx/html
