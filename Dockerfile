@@ -40,4 +40,6 @@ RUN cat /usr/src/php/php.ini-production | sed 's/^;\(date.timezone.*\)/\1 \"Etc\
 # Disable cgi.fix_pathinfo in php.ini
 RUN sed -i 's/;\(cgi\.fix_pathinfo=\)1/\10/' /usr/local/etc/php/php.ini
 
-WORKDIR /usr/share/nginx/html
+RUN usermod -u 1000 www-data && a2enmod rewrite
+
+WORKDIR /var/www/html
