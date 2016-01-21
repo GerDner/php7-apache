@@ -40,6 +40,20 @@ RUN cat /usr/src/php/php.ini-production | sed 's/^;\(date.timezone.*\)/\1 \"Etc\
 # Disable cgi.fix_pathinfo in php.ini
 RUN sed -i 's/;\(cgi\.fix_pathinfo=\)1/\10/' /usr/local/etc/php/php.ini
 
+
+RUN line=$(head -n 1 /etc/hosts | awk '{printf "%s %s.localdomain %s", $1, $2, $2}') \
+	&& sed -e "1 s/^.*$/${line}/g" /etc/hosts > hosts_tmp \
+	&& cp hosts_tmp /etc/hosts \
+	&& rm hosts_tmp \
+	&& service sendmail start \
+	&& echo "sendmail_path=/usr/sbin/sendmail -i -t" >> /usr/local/etc/php/php.ini
+
 RUN usermod -u 1000 www-data && a2enmod rewrite
+
+ADD start.sh /start.sh
+
+RUN chmod +x /start.sh
+
+CMD ["/start.sh"]
 
 WORKDIR /var/www/html
